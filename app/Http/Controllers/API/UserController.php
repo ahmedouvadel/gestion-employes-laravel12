@@ -8,49 +8,29 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Affiche la liste des utilisateurs.
-     */
+    // 📌 Afficher tous les utilisateurs
     public function index()
     {
-        return User::select('id', 'name', 'email', 'created_at')->get();
+        return response()->json(
+            User::select('id', 'name', 'email', 'created_at')->get()
+        );
     }
 
-    /**
-     * Affiche un utilisateur spécifique.
-     */
+    // 📌 Afficher un utilisateur par ID
     public function show(User $user)
     {
-        return response()->json($user);
-    }
-
-    /**
-     * Met à jour un utilisateur.
-     */
-    public function update(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'password' => 'sometimes|required|min:6',
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'created_at' => $user->created_at,
         ]);
-
-        if (isset($validated['password'])) {
-            $validated['password'] = bcrypt($validated['password']);
-        }
-
-        $user->update($validated);
-
-        return response()->json($user);
     }
 
-    /**
-     * Supprime un utilisateur.
-     */
+    // 📌 Supprimer un utilisateur
     public function destroy(User $user)
     {
         $user->delete();
-
         return response()->json(['message' => 'Utilisateur supprimé.']);
     }
 }
